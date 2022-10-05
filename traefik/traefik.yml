@@ -1,0 +1,33 @@
+entryPoints:
+  web:
+    address: :80
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    address: :443
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: f.ribeirogarioli@gmail.com
+      storage: /acme.json
+      tlschallenge: true
+
+providers:
+  docker:
+    network: traefik
+    defaultRule: "Host(`{{ trimPrefix `/` .Name }}.test`)"
+    exposedByDefault: false
+  file:
+    directory: ./external
+
+api:
+  insecure: false
+  dashboard: true
+
+log:
+  level: DEBUG

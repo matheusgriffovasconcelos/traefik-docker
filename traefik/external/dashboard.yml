@@ -1,0 +1,7 @@
+http:
+  routers:
+    traefik:
+      rule: Host(`dashboard.test`)
+      service: api@internal
+      certresolver: letsencrypt
+      entrypoints: websecure
