@@ -3,5 +3,6 @@ http:
     traefik:
       rule: Host(`dashboard.test`)
       service: api@internal
-      certresolver: letsencrypt
       entrypoints: websecure
+      tls:
+        certresolver: letsencrypt

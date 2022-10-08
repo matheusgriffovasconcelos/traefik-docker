@@ -2,10 +2,10 @@ version: "3.9"
 
 services:
   dnsmasq:
-    image: 4km3/dnsmasq
+    build: ./dnsmasq
+    container_name: dnsmasq
     cap_add:
       - NET_ADMIN
-    restart: unless-stopped
     ports:
       - "53:53/udp"
       - "53:53/tcp"
@@ -20,16 +20,11 @@ services:
       - "80:80"
       - "443:443"
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik/traefik.yml:/etc/traefik/traefik.yml
       - ./traefik/acme.json:/acme.json
       - ./traefik/external:/external
-    # labels:
-    #   # Dashboard
-    #   - "traefik.http.routers.traefik.rule=Host(`dashboard.caiodelgado.com.br`)"
-    #   - "traefik.http.routers.traefik.service=api@internal"
-    #   - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
-    #   - "traefik.http.routers.traefik.entrypoints=websecure"
     networks:
       - traefik
 
@@ -44,10 +39,12 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./portainer-data:/data
     labels:
+      - "traefik.enable=true"
       - "traefik.http.routers.portainer.rule=Host(`portainer.test`)"
-      - "traefik.http.routers.portainer.entrypoints=websecure"
       - "traefik.http.routers.portainer.tls=true"
       - "traefik.http.routers.portainer.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.portainer.entrypoints=websecure"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
     networks:
       - traefik
 
