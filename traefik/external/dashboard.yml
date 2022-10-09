@@ -1,8 +1,9 @@
 http:
   routers:
     traefik:
-      rule: Host(`dashboard.test`)
+      rule: Host(`dashboard.traefik.me`)
       service: api@internal
       entrypoints: websecure
       tls:
-        certresolver: letsencrypt
+        domains:
+          - dashboard.traefik.me

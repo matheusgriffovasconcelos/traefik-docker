@@ -1,18 +1,6 @@
 version: "3.9"
 
 services:
-  dnsmasq:
-    build: ./dnsmasq
-    container_name: dnsmasq
-    cap_add:
-      - NET_ADMIN
-    ports:
-      - "53:53/udp"
-      - "53:53/tcp"
-    volumes:
-      - ./dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf
-    command: --log-facility=-
-
   traefik:
     image: traefik:v2.9.1
     container_name: traefik
@@ -25,6 +13,7 @@ services:
       - ./traefik/traefik.yml:/etc/traefik/traefik.yml
       - ./traefik/acme.json:/acme.json
       - ./traefik/external:/external
+      - ./traefik/certs:/etc/ssl/traefik
     networks:
       - traefik
 
@@ -40,13 +29,22 @@ services:
       - ./portainer-data:/data
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.portainer.rule=Host(`portainer.test`)"
-      - "traefik.http.routers.portainer.tls=true"
-      - "traefik.http.routers.portainer.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.traefik.me`)"
+      # - "traefik.http.routers.portainer.tls=true"
+      # - "traefik.http.routers.portainer.tls.certresolver=letsencrypt"
       - "traefik.http.routers.portainer.entrypoints=websecure"
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+      - "traefik.http.routers.portainer.tls.domains[0].main=portainer.traefik.me"
     networks:
       - traefik
+
+  reverse-proxy-https-helper:
+    image: alpine
+    command: sh -c "cd /etc/ssl/traefik
+      && wget traefik.me/cert.pem -O cert.pem
+      && wget traefik.me/privkey.pem -O privkey.pem"
+    volumes:
+      - ./traefik/certs:/etc/ssl/traefik
 
 networks:
   traefik:

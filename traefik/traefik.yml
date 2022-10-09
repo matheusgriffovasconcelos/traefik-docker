@@ -10,18 +10,10 @@ entryPoints:
   websecure:
     address: :443
 
-certificatesResolvers:
-  letsencrypt:
-    acme:
-      email: f.ribeirogarioli@gmail.com
-      storage: /acme.json
-      tlschallenge: true
-      caserver: https://acme-staging-v02.api.letsencrypt.org/directory
-
 providers:
   docker:
     network: traefik
-    defaultRule: "Host(`{{ trimPrefix `/` .Name }}.test`)"
+    defaultRule: "HostRegexp(`{{ index .Labels \"com.docker.compose.service\"}}.traefik.me`,`{{ index .Labels \"com.docker.compose.service\"}}-{dashed-ip:.*}.traefik.me`)"
     exposedByDefault: false
   file:
     directory: ./external
