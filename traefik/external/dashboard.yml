@@ -1,8 +1,19 @@
 http:
   routers:
     traefik:
-      rule: Host(`dashboard.test`)
+      rule: Host(`traefik.fgarioli.com.br`)
       service: api@internal
       entrypoints: websecure
       tls:
-        certresolver: letsencrypt
+        certResolver: letsencrypt
+      middlewares:
+        - "traefik-auth"
+  middlewares:
+    traefik-auth:
+      basicAuth:
+        usersFile: "/etc/traefik/users.conf"
+  services:
+    traefik:
+      loadBalancer:
+        servers:
+          - "http://traefik:8080"

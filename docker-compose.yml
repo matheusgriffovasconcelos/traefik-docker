@@ -1,18 +1,6 @@
 version: "3.9"
 
 services:
-  dnsmasq:
-    build: ./dnsmasq
-    container_name: dnsmasq
-    cap_add:
-      - NET_ADMIN
-    ports:
-      - "53:53/udp"
-      - "53:53/tcp"
-    volumes:
-      - ./dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf
-    command: --log-facility=-
-
   traefik:
     image: traefik:v2.9.1
     container_name: traefik
@@ -23,8 +11,10 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik/traefik.yml:/etc/traefik/traefik.yml
+      - ./traefik/users.conf:/etc/traefik/users.conf
       - ./traefik/acme.json:/acme.json
       - ./traefik/external:/external
+      - ./traefik/certs:/etc/ssl/traefik
     networks:
       - traefik
 
@@ -40,7 +30,7 @@ services:
       - ./portainer-data:/data
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.portainer.rule=Host(`portainer.test`)"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.fgarioli.com.br`)"
       - "traefik.http.routers.portainer.tls=true"
       - "traefik.http.routers.portainer.tls.certresolver=letsencrypt"
       - "traefik.http.routers.portainer.entrypoints=websecure"

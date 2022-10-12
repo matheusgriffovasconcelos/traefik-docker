@@ -15,14 +15,14 @@ certificatesResolvers:
     acme:
       email: f.ribeirogarioli@gmail.com
       storage: /acme.json
-      tlschallenge: true
-      caserver: https://acme-staging-v02.api.letsencrypt.org/directory
+      tlschallenge: {}
+      # caserver: https://acme-staging-v02.api.letsencrypt.org/directory
 
 providers:
   docker:
     network: traefik
-    defaultRule: "Host(`{{ trimPrefix `/` .Name }}.test`)"
     exposedByDefault: false
+    # swarmMode: true
   file:
     directory: ./external
 
